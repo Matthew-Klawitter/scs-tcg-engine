@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+enum rarity {
+  common
+  uncommon
+  rare
+  legendary
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  name String?
+  email String @unique
+  relatedNames RelatedName[]
+  cardCollection CardCollection[]
+}
+
+model RelatedName {
+  id Int @id @default(autoincrement())
+  name String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model CardSet {
+  id Int @id @default(autoincrement())
+  setName String @unique
+  cards Card[]
+}
+
+model Card {
+  id Int @id @default(autoincrement())
+  name String
+  desc String
+  rarity rarity
+  cartSet CardSet @relation(fields: [cardSetId], references: [id])
+  cardSetId Int
+  cardCollection CardCollection[]
+}
+
+model CardCollection {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  card Card @relation(fields: [cardId], references: [id])
+  cardId Int
+  quantity Int
+}
